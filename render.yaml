@@ -28,13 +28,15 @@ services:
       - key: MAIL_HOST
         value: smtp.gmail.com
       - key: MAIL_PORT
-        value: "587"
+        value: "465"
+      - key: MAIL_SCHEME
+        value: smtps
       - key: MAIL_USERNAME
         value: soportesafewatch@gmail.com
       - key: MAIL_PASSWORD
         value: mxmpvgixlvxesziv
       - key: MAIL_ENCRYPTION
-        value: tls
+        value: ssl
       - key: MAIL_FROM_ADDRESS
         value: soportesafewatch@gmail.com
       - key: MAIL_FROM_NAME
