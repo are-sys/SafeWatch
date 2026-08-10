@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AnalysisController;
 use App\Http\Controllers\Api\AlertController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BackupController;
@@ -13,16 +14,26 @@ use Illuminate\Support\Facades\Route;
 // Auth público
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/check-email', [AuthController::class, 'checkEmail']);
+Route::post('/verify-2fa', [AuthController::class, 'verify2Fa']);
+Route::post('/resend-2fa', [AuthController::class, 'resend2Fa']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/verify-reset-code', [AuthController::class, 'verifyResetCode']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 // Protegido con token
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
 
+    Route::post('/2fa/enable', [AuthController::class, 'enable2Fa']);
+    Route::post('/2fa/disable', [AuthController::class, 'disable2Fa']);
+
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
     Route::get('/vitals', [VitalSignController::class, 'index']);
     Route::post('/vitals', [VitalSignController::class, 'store']);
+    Route::get('/vitals/ml-analysis', [AnalysisController::class, 'mlAnalysis']);
 
     Route::get('/alerts', [AlertController::class, 'index']);
     Route::post('/alerts/sos', [AlertController::class, 'sos']);
@@ -35,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/users', [AdminController::class, 'users']);
         Route::patch('/admin/users/{user}/role', [AdminController::class, 'updateRole']);
+        Route::delete('/admin/users/{user}', [AdminController::class, 'destroy']);
 
         // Respaldos
         Route::get('/admin/backups', [BackupController::class, 'index']);
@@ -54,3 +66,4 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/patients/{patient}/unassign', [DoctorController::class, 'unassign']);
     });
 });
+

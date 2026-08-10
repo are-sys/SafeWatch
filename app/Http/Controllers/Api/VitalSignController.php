@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Alert;
 use App\Models\VitalSign;
+use App\Services\MachineLearningService;
 use Illuminate\Http\Request;
 
 class VitalSignController extends Controller
@@ -35,6 +36,12 @@ class VitalSignController extends Controller
         $data['recorded_at'] = now();
 
         $vital = VitalSign::create($data);
+
+        // Run ML Supervised (Softmax/Random Forest) & Unsupervised (Isolation Forest) models
+        $mlAnalysis = MachineLearningService::analyze($vital);
+        $vital->ml_analysis = $mlAnalysis;
+        $vital->save();
+
         $this->checkForAlerts($vital);
 
         return response()->json(['status' => 'ok', 'vital' => $vital], 201);
@@ -81,6 +88,18 @@ class VitalSignController extends Controller
                 'type' => 'blood_pressure',
                 'severity' => $vital->blood_pressure_systolic > 180 ? 'critical' : 'high',
                 'message' => "Presión arterial alta: {$vital->blood_pressure_systolic}/{$vital->blood_pressure_diastolic}",
+                'latitude' => $vital->latitude,
+                'longitude' => $vital->longitude,
+            ]);
+        }
+
+        // Anomaly Detection
+        if (!empty($vital->ml_analysis['is_anomaly'])) {
+            Alert::create([
+                'user_id' => $vital->user_id,
+                'type' => 'anomaly',
+                'severity' => 'critical',
+                'message' => "Anomalía fisiológica detectada en constantes vitales (Nivel: {$vital->ml_analysis['anomaly_score']})",
                 'latitude' => $vital->latitude,
                 'longitude' => $vital->longitude,
             ]);

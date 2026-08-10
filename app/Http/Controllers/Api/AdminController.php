@@ -34,4 +34,27 @@ class AdminController extends Controller
 
         return response()->json(['status' => 'updated', 'user' => $user]);
     }
+
+    public function destroy(Request $request, User $user)
+    {
+        if ($request->user()->id === $user->id) {
+            return response()->json(['message' => 'No puedes eliminar tu propia cuenta.'], 422);
+        }
+
+        // Remove related MongoDB records
+        $user->medicalProfile()?->delete();
+        $user->vitalSigns()->delete();
+        $user->alerts()->delete();
+        $user->tokens()->delete();
+
+        // If doctor, unassign patients
+        User::where('doctor_id', $user->id)->update(['doctor_id' => null]);
+
+        $user->delete();
+
+        return response()->json([
+            'status' => 'deleted',
+            'message' => "La cuenta del usuario '{$user->name}' fue eliminada permanentemente.",
+        ]);
+    }
 }

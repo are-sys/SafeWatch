@@ -9,14 +9,14 @@ export default function Privacy() {
                 className="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-10">
 
                 <div className="flex items-center gap-3 mb-6">
-                    <img src="/images/logo.png" alt="ShieldTech" className="w-12 h-12 object-contain" />
-                    <h1 className="text-2xl font-bold text-gray-800">Aviso de Privacidad</h1>
+                    <img src="/images/logo.png" alt="SafeWatch" className="w-12 h-12 object-contain" />
+                    <h1 className="text-2xl font-bold text-gray-800">Aviso de Privacidad de SafeWatch</h1>
                 </div>
                 <p className="text-xs text-gray-400 mb-6">Ultima actualizacion: Abril 2026</p>
 
                 <div className="prose prose-sm prose-gray max-w-none space-y-4 text-gray-600">
                     <h3 className="text-gray-800 font-semibold">1. Responsable del Tratamiento</h3>
-                    <p>ShieldTech es una aplicacion de monitoreo de salud desarrollada con fines academicos.</p>
+                    <p>SafeWatch es una aplicacion de monitoreo de salud desarrollada con fines academicos.</p>
 
                     <h3 className="text-gray-800 font-semibold">2. Datos que Recopilamos</h3>
                     <ul className="list-disc pl-5 space-y-1">

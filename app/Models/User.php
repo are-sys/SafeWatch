@@ -19,11 +19,15 @@ class User extends Authenticatable
         'password',
         'role',
         'doctor_id',
+        'two_factor_enabled',
+        'two_factor_code',
+        'two_factor_expires_at',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_code',
     ];
 
     protected function casts(): array
@@ -31,6 +35,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_enabled' => 'boolean',
+            'two_factor_expires_at' => 'datetime',
         ];
     }
 

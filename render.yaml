@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: safewatch
+    runtime: docker
+    plan: free
+    region: oregon
+    envVars:
+      - key: APP_NAME
+        value: SafeWatch
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: mongodb
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
