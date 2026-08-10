@@ -3,7 +3,7 @@ set -e
 
 # Dynamically set port for Render
 PORT=${PORT:-10000}
-sed -i "s/listen [0-9]*/listen ${PORT}/g" /etc/nginx/http.d/default.conf
+sed -i "s/listen 10000;/listen ${PORT};/g" /etc/nginx/http.d/default.conf
 
 # Cache Laravel configuration & routes for production
 php artisan config:cache || true

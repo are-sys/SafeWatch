@@ -34,7 +34,7 @@ return [
 
         'mongodb' => [
             'driver' => 'mongodb',
-            'dsn' => env('DB_URI'),
+            'dsn' => env('DB_URI') ?: env('MONGODB_URI'),
             'database' => env('DB_DATABASE', 'shieldtech'),
         ],
 
