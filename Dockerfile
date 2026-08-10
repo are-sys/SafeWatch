@@ -23,7 +23,8 @@ RUN apk add --no-cache \
     icu-dev \
     oniguruma-dev \
     nginx \
-    supervisor
+    supervisor \
+    && mkdir -p /var/log/supervisor /var/run
 
 # Install PHP MongoDB extension & core extensions
 RUN pecl install mongodb && docker-php-ext-enable mongodb
