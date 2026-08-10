@@ -24,9 +24,12 @@ class TwoFactorCodeNotification extends Notification
 
     public function toMail($notifiable): MailMessage
     {
+        $name = is_object($notifiable) && isset($notifiable->name) ? $notifiable->name : 'Usuario';
+
         return (new MailMessage)
             ->subject('📩 Tu Código de Confirmación de 6 Dígitos — SafeWatch Health')
-            ->greeting('Hola, ' . ($notifiable->name ?? 'Usuario'))
+            ->greeting('Hola, ' . $name)
+
             ->line('Tu código de confirmación de 6 dígitos para acceder a la plataforma de monitoreo biométrico SafeWatch es:')
             ->line('### 🔐 ' . $this->code)
             ->line('Este código de seguridad expira en 10 minutos.')

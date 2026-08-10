@@ -285,12 +285,8 @@ export default function Login() {
                                 <p className="text-xs text-slate-300 mt-1.5">
                                     {otpMessage} (<strong className="text-white">{otpEmail}</strong>)
                                 </p>
-                                {debugCode && (
-                                    <div className="mt-2.5 p-2.5 rounded-xl bg-[#0D8BFF]/20 border border-[#0D8BFF]/40 text-cyan-300 text-xs font-bold flex items-center justify-center gap-2">
-                                        <span>🔐 Código de Seguridad: <strong className="text-white tracking-widest text-sm font-black">{debugCode}</strong></span>
-                                    </div>
-                                )}
                             </div>
+
 
 
                             {otpError && (
