@@ -10,12 +10,16 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: "false"
+        value: "true"
       - key: APP_KEY
-        generateValue: true
+        value: base64:mW1RosyZ1DROfnVAOJ2LVsE7PwKu06+FwuWqvSLwk38=
       - key: DB_CONNECTION
         value: mongodb
+      - key: DB_DATABASE
+        value: shieldtech
+      - key: DB_URI
+        sync: false
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
-        generateValue: true
+        value: base64:mW1RosyZ1DROfnVAOJ2LVsE7PwKu06+FwuWqvSLwk38=
