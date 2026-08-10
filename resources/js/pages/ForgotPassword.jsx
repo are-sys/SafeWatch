@@ -21,6 +21,8 @@ export default function ForgotPassword() {
     const [otpError, setOtpError] = useState('');
     const [otpLoading, setOtpLoading] = useState(false);
     const [resendCooldown, setResendCooldown] = useState(0);
+    const [debugCode, setDebugCode] = useState(null);
+
 
     // Step 3: New Password state
     const [resetToken, setResetToken] = useState('');
@@ -80,10 +82,14 @@ export default function ForgotPassword() {
 
         setEmailLoading(true);
         try {
-            await forgotPassword(email);
+            const res = await forgotPassword(email);
+            if (res?.debug_code) {
+                setDebugCode(res.debug_code);
+            }
             setStep('code');
             setResendCooldown(60);
         } catch (err) {
+
             if (err.response?.data?.errors?.email) {
                 setEmailError(err.response.data.errors.email[0]);
             } else {
@@ -296,7 +302,13 @@ export default function ForgotPassword() {
                                 <p className="text-xs text-slate-300 mt-1.5">
                                     Hemos enviado 6 dígitos a <strong className="text-white">{email}</strong>
                                 </p>
+                                {debugCode && (
+                                    <div className="mt-2.5 p-2.5 rounded-xl bg-[#0D8BFF]/20 border border-[#0D8BFF]/40 text-cyan-300 text-xs font-bold flex items-center justify-center gap-2">
+                                        <span>🔐 Código de Seguridad: <strong className="text-white tracking-widest text-sm font-black">{debugCode}</strong></span>
+                                    </div>
+                                )}
                             </div>
+
 
                             {otpError && (
                                 <div className="bg-red-500/20 border border-red-500/40 text-red-200 text-sm p-3 rounded-xl mb-5 flex items-center gap-2">

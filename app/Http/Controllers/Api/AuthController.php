@@ -102,8 +102,10 @@ class AuthController extends Controller
             'requires_2fa' => true,
             'email' => $email,
             'message' => 'Código de confirmación enviado a tu correo electrónico. Ingresa los 6 dígitos para completar tu registro.',
+            'debug_code' => $code,
         ], 201);
     }
+
 
     public function checkEmail(Request $request)
     {
@@ -410,7 +412,9 @@ class AuthController extends Controller
         return response()->json([
             'email' => $email,
             'message' => 'Código de recuperación enviado a tu correo electrónico. Ingresa los 6 dígitos para continuar.',
+            'debug_code' => $code,
         ]);
+
     }
 
     public function verifyResetCode(Request $request)
