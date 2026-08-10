@@ -10,7 +10,7 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: "true"
+        value: "false"
       - key: APP_KEY
         value: base64:mW1RosyZ1DROfnVAOJ2LVsE7PwKu06+FwuWqvSLwk38=
       - key: DB_CONNECTION
@@ -23,3 +23,19 @@ services:
         sync: false
       - key: JWT_SECRET
         value: base64:mW1RosyZ1DROfnVAOJ2LVsE7PwKu06+FwuWqvSLwk38=
+      - key: MAIL_MAILER
+        value: smtp
+      - key: MAIL_HOST
+        value: smtp.gmail.com
+      - key: MAIL_PORT
+        value: "587"
+      - key: MAIL_USERNAME
+        value: soportesafewatch@gmail.com
+      - key: MAIL_PASSWORD
+        value: mxmpvgixlvxesziv
+      - key: MAIL_ENCRYPTION
+        value: tls
+      - key: MAIL_FROM_ADDRESS
+        value: soportesafewatch@gmail.com
+      - key: MAIL_FROM_NAME
+        value: SafeWatch
