@@ -15,6 +15,7 @@ RUN apk add --no-cache \
     git \
     build-base \
     autoconf \
+    linux-headers \
     openssl-dev \
     libzip-dev \
     zip \
