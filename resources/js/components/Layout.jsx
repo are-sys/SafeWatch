@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { IconGrid, IconHeart, IconBell, IconUser, IconLogout, IconUsers, IconDatabase } from './Icons';
@@ -31,6 +31,47 @@ export default function Layout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [isInstalled, setIsInstalled] = useState(false);
+
+    useEffect(() => {
+        const handleBeforeInstall = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+        };
+
+        const handleAppInstalled = () => {
+            setIsInstalled(true);
+            setDeferredPrompt(null);
+            console.log('[SafeWatch PWA] App instalada con éxito');
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+        window.addEventListener('appinstalled', handleAppInstalled);
+
+        // Check if running as standalone PWA
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            setIsInstalled(true);
+        }
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
+    }, []);
+
+    const handleInstallClick = async () => {
+        if (!deferredPrompt) {
+            alert('Para instalar SafeWatch PWA en iOS o desde tu navegador, presiona el botón "Compartir" o "Menú" y selecciona "Añadir a la pantalla de inicio".');
+            return;
+        }
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            setIsInstalled(true);
+        }
+        setDeferredPrompt(null);
+    };
 
     const navItems = getNavItems(user?.role);
     const logoHome = user?.role === 'admin' ? '/admin/users' : '/dashboard';
@@ -64,7 +105,7 @@ export default function Layout() {
                                     SafeWatch
                                 </span>
                                 <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-black tracking-widest text-[#0D8BFF] bg-[#0D8BFF]/15 border border-[#0D8BFF]/30 rounded-full uppercase">
-                                    {user?.role === 'admin' ? 'Admin Panel' : 'Health'}
+                                    {user?.role === 'admin' ? 'Admin Panel' : 'Health PWA'}
                                 </span>
                             </div>
                             <span className="text-[10px] text-slate-400 font-medium tracking-wide hidden sm:block">
@@ -85,6 +126,18 @@ export default function Layout() {
 
                     {/* User Profile & Actions */}
                     <div className="hidden md:flex items-center gap-3">
+                        {/* Botón Instalable PWA */}
+                        {!isInstalled && (
+                            <button
+                                onClick={handleInstallClick}
+                                className="px-3 py-1.5 rounded-xl text-xs font-black text-cyan-300 hover:text-white bg-cyan-500/15 hover:bg-cyan-500/30 border border-cyan-400/30 backdrop-blur-md transition-all duration-300 flex items-center gap-1.5 shadow-md shadow-cyan-500/20 active:scale-95 cursor-pointer animate-pulse"
+                                title="Instalar SafeWatch como App en tu dispositivo"
+                            >
+                                <span>📲</span>
+                                <span>Instalar App</span>
+                            </button>
+                        )}
+
                         <NavLink 
                             to="/profile" 
                             className="flex items-center gap-3 bg-white/5 hover:bg-white/12 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 group hover:shadow-lg hover:shadow-[#0D8BFF]/10"
@@ -114,15 +167,26 @@ export default function Layout() {
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <button 
-                        className="md:hidden text-white p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/10" 
-                        onClick={() => setMenuOpen(!menuOpen)}
-                        aria-label="Abrir menú"
-                    >
-                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-                            <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
-                        </svg>
-                    </button>
+                    <div className="flex md:hidden items-center gap-2">
+                        {!isInstalled && (
+                            <button
+                                onClick={handleInstallClick}
+                                className="px-2.5 py-1.5 rounded-xl text-xs font-black text-cyan-300 bg-cyan-500/20 border border-cyan-400/40 flex items-center gap-1"
+                            >
+                                <span>📲</span>
+                                <span>Instalar</span>
+                            </button>
+                        )}
+                        <button 
+                            className="text-white p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/10" 
+                            onClick={() => setMenuOpen(!menuOpen)}
+                            aria-label="Abrir menú"
+                        >
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                <path fillRule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Mobile Menu Dropdown */}
@@ -144,6 +208,17 @@ export default function Layout() {
                                 <div className="text-xs text-[#0D8BFF] font-extrabold uppercase tracking-wider">{user?.role}</div>
                             </div>
                         </NavLink>
+
+                        {!isInstalled && (
+                            <button 
+                                onClick={handleInstallClick}
+                                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-extrabold text-cyan-200 bg-cyan-500/20 hover:bg-cyan-500/30 rounded-xl mb-3 border border-cyan-400/40 transition-all cursor-pointer"
+                            >
+                                <span className="text-base">📲</span>
+                                <span>Instalar App SafeWatch en tu dispositivo</span>
+                            </button>
+                        )}
+
                         {navItems.map(item => (
                             <NavLink key={item.to} to={item.to} onClick={() => setMenuOpen(false)}
                                 className={({ isActive }) => `flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-bold transition-all ${isActive ? 'bg-[#0D8BFF] text-white shadow-lg shadow-[#0D8BFF]/30' : 'text-slate-300 hover:bg-white/10'}`}>
@@ -152,7 +227,7 @@ export default function Layout() {
                         ))}
                         <button 
                             onClick={handleLogout} 
-                            className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-bold text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 rounded-xl mt-3 border border-rose-500/20 transition-all"
+                            className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-bold text-rose-300 hover:text-white bg-rose-500/10 hover:bg-rose-500/20 rounded-xl mt-3 border border-rose-500/20 transition-all cursor-pointer"
                         >
                             <IconLogout className="text-base text-rose-400" />
                             <span>Cerrar sesión</span>
@@ -179,5 +254,3 @@ export default function Layout() {
         </div>
     );
 }
-
-
