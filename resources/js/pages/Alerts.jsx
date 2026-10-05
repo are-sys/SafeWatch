@@ -1,16 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
 import PageTransition from '../components/PageTransition';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 
-const typeLabels = { sos: 'SOS', heart_rate: 'Ritmo cardíaco', oxygen: 'Oxígeno', temperature: 'Temperatura', blood_pressure: 'Presión', fall_detected: 'Caída' };
 const sevColors = { critical: 'bg-red-500 shadow-md shadow-red-500/30', high: 'bg-amber-500 shadow-md shadow-amber-500/30', medium: 'bg-[#0D8BFF] shadow-md shadow-[#0D8BFF]/30', low: 'bg-emerald-500 shadow-md shadow-emerald-500/30' };
 
 export default function Alerts() {
-    const [alerts, setAlerts] = useState({ data: [] });
-    const load = (url = '/alerts') => api.get(url).then(r => setAlerts(r.data));
+    const cachedAlerts = getStorageItem('safewatch_alerts_cache', { data: [] });
+    const [alerts, setAlerts] = useState(cachedAlerts);
+
+    const load = (url = '/alerts') => {
+        api.get(url).then(r => {
+            setAlerts(r.data);
+            setStorageItem('safewatch_alerts_cache', r.data);
+        }).catch(err => {
+            console.log('Using cached alerts:', err);
+        });
+    };
+
     useEffect(() => { load(); }, []);
 
-    const resolve = async (id) => { await api.patch(`/alerts/${id}/resolve`); load(); };
+    const resolve = async (id) => { 
+        await api.patch(`/alerts/${id}/resolve`); 
+        load(); 
+    };
 
     const sendSOS = async () => {
         if (!confirm('¿Deseas enviar una alerta de emergencia SOS?')) return;
@@ -26,7 +39,7 @@ export default function Alerts() {
                     <p className="text-slate-500 font-medium text-sm mt-1">Gestión de alertas médicas y respuestas de emergencia</p>
                 </div>
                 <button onClick={sendSOS}
-                    className="w-14 h-14 rounded-full bg-gradient-to-tr from-red-600 to-rose-500 hover:from-rose-600 hover:to-red-700 text-white font-black text-xs btn-sos-pulse shadow-lg shadow-red-500/40 flex items-center justify-center flex-shrink-0">
+                    className="w-14 h-14 rounded-full bg-gradient-to-tr from-red-600 to-rose-500 hover:from-rose-600 hover:to-red-700 text-white font-black text-xs btn-sos-pulse shadow-lg shadow-red-500/40 flex items-center justify-center flex-shrink-0 cursor-pointer">
                     SOS
                 </button>
             </div>
@@ -70,7 +83,7 @@ export default function Alerts() {
                                     </span>
                                 ) : (
                                     <button onClick={() => resolve(a.id)}
-                                        className="text-xs px-4 py-2 rounded-xl bg-gradient-to-r from-[#0D8BFF] to-[#1E5EFF] hover:from-[#1E5EFF] hover:to-[#1466CC] text-white font-bold shadow-md shadow-[#0D8BFF]/30 transition active:scale-95">
+                                        className="text-xs px-4 py-2 rounded-xl bg-gradient-to-r from-[#0D8BFF] to-[#1E5EFF] hover:from-[#1E5EFF] hover:to-[#1466CC] text-white font-bold shadow-md shadow-[#0D8BFF]/30 transition active:scale-95 cursor-pointer">
                                         Marcar Resuelta
                                     </button>
                                 )}
@@ -104,4 +117,3 @@ export default function Alerts() {
         </PageTransition>
     );
 }
-

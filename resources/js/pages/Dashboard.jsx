@@ -5,6 +5,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement
 import api from '../api';
 import PageTransition from '../components/PageTransition';
 import MLAnalysisCard from '../components/MLAnalysisCard';
+import { getStorageItem, setStorageItem } from '../utils/storage';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip);
 
@@ -15,9 +16,12 @@ const cardAnim = (i) => ({
 });
 
 export default function Dashboard() {
-    const [data, setData] = useState(null);
-    const [mlData, setMlData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const cachedData = getStorageItem('safewatch_dashboard_cache', null);
+    const cachedMl = getStorageItem('safewatch_ml_cache', null);
+
+    const [data, setData] = useState(cachedData);
+    const [mlData, setMlData] = useState(cachedMl);
+    const [loading, setLoading] = useState(!cachedData);
 
     useEffect(() => {
         Promise.all([
@@ -25,7 +29,13 @@ export default function Dashboard() {
             api.get('/vitals/ml-analysis').catch(() => null)
         ]).then(([dashRes, mlRes]) => {
             setData(dashRes.data);
-            if (mlRes) setMlData(mlRes.data);
+            setStorageItem('safewatch_dashboard_cache', dashRes.data);
+            if (mlRes) {
+                setMlData(mlRes.data);
+                setStorageItem('safewatch_ml_cache', mlRes.data);
+            }
+        }).catch(err => {
+            console.log('Using offline local storage cache:', err);
         }).finally(() => setLoading(false));
     }, []);
 
