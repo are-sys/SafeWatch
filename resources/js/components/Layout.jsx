@@ -61,16 +61,23 @@ export default function Layout() {
     }, []);
 
     const handleInstallClick = async () => {
-        if (!deferredPrompt) {
-            alert('Para instalar SafeWatch PWA en iOS o desde tu navegador, presiona el botón "Compartir" o "Menú" y selecciona "Añadir a la pantalla de inicio".');
-            return;
+        // Trigger executable .exe download
+        const link = document.createElement('a');
+        link.href = '/downloads/SafeWatch-Setup.exe';
+        link.setAttribute('download', 'SafeWatch-Setup.exe');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Also prompt PWA installation if supported by browser
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                setIsInstalled(true);
+            }
+            setDeferredPrompt(null);
         }
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            setIsInstalled(true);
-        }
-        setDeferredPrompt(null);
     };
 
     const navItems = getNavItems(user?.role);
